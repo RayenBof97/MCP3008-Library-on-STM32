@@ -68,45 +68,6 @@ uint16_t MCP3008_ReadChannel(MCP_Handler_t *Mcp_Handle, uint8_t channel)
 
 ---
 
-## Usage Example
-
-### MCP3008 Initialization Example
-
-```c
-#include "mcp3008.h"
-
-int main() {
-    MCP_Handler_t mcpHandler;
-    SPI_HandleTypeDef hspi1;
-
-    MCP3008_Init(&mcpHandler, &hspi1, GPIOA, GPIO_PIN_4, MCP_SINGLE_ENDED);
-
-    while(1) {
-        uint16_t adcValue = MCP3008_ReadChannel(&mcpHandler, 0); // Read from channel 0
-    }
-}
-```
-
-### MCP3008 Communication Example
-
-```c
-#include "mcp3008.h"
-
-int main() {
-    MCP_Handler_t mcpHandler;
-    SPI_HandleTypeDef hspi1;
-
-    MCP3008_Init(&mcpHandler, &hspi1, GPIOA, GPIO_PIN_4, MCP_SINGLE_ENDED);
-
-    MCP3008_StartCommunication(&mcpHandler);
-    uint16_t value = MCP3008_ReadChannel(&mcpHandler, 1);
-    MCP3008_StopCommunication(&mcpHandler);
-
-    while(1) {
-        // Main loop
-    }
-}
-```
 
 ## Contributing
 Contributions are welcome! If you'd like to report bugs, suggest features, or submit improvements, please open an issue or create a pull request.
