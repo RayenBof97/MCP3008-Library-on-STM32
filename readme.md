@@ -1,144 +1,106 @@
+# MCP3008 Driver Library
 
-# STM32F4xx GPIO Driver
-
-This repository contains a custom driver library for STM32F4xx microcontrollers, written entirely from scratch as part of my learning journey. It provides basic and modular functions to configure and interact with peripherals, helping me deepen my understanding of embedded systems and microcontroller programming
-
-For this, I'm using my Nucleo-F401RE board, and you can find its datasheet on the  [official STM32 website](https://www.st.com/en/evaluation-tools/nucleo-f401re.html) 
-
+This repository contains a custom driver library for the MCP3008 ADC (Analog-to-Digital Converter). It provides basic and modular functions to configure and interact with the MCP3008 for my future projects.
+The chip is provided by Microchip and you can find its datasheet [in this link.](https://cdn-shop.adafruit.com/datasheets/MCP3008.pdf) 
 
 ## Clone the Repository  
 If you're interested in exploring the code, you can clone this repository to your STM32CubeIDE workspace using the following command:  
 ```bash
-git clone https://github.com/RayenBof97/stm32f4xx-driver.git  
+git clone https://github.com/RayenBof97/MCP3008-Library-on-STM32
 ```
-
 
 ## API Reference
 
-
-#### GPIO Initialization
-
-```c
-void RB_GPIO_Init(GPIOx_Handler_t *pGPIOHandle)
-```
-
-| Parameter            | Type             | Description                                         |
-| :------------------- | :--------------- | :-------------------------------------------------- |
-| `pGPIOHandle`        | `GPIOx_Handler_t*` | **Required**. Pointer to the GPIO handler structure containing the configuration for the GPIO pin. |
-
-#### GPIO Clock Control
+#### MCP Initialization
 
 ```c
-void RB_GPIO_PeriClockControl(GPIOx_t *pGPIOx, uint8_t State)
+void MCP3008_Init(MCP_Handler_t *Mcp_handle, SPI_HandleTypeDef* hspi, GPIO_TypeDef *pCS_gpio, uint16_t CS_PinNumber, uint8_t MCP_Mode)
 ```
 
-| Parameter            | Type             | Description                                         |
-| :------------------- | :--------------- | :-------------------------------------------------- |
-| `pGPIOx`             | `GPIOx_t*`       | **Required**. Pointer to the GPIO port (e.g., `GPIOA`). |
-| `State`              | `uint8_t`        | **Required**. State to enable (`SET`) or disable (`RESET`) the GPIO peripheral clock. |
+| Parameter       | Type                 | Description                                                                 |
+| :-------------- | :------------------- | :-------------------------------------------------------------------------- |
+| `Mcp_handle`    | `MCP_Handler_t*`     | **Required**. Pointer to the MCP handler structure.                         |
+| `hspi`          | `SPI_HandleTypeDef*` | **Required**. SPI handle used for communication.                            |
+| `pCS_gpio`      | `GPIO_TypeDef*`      | **Required**. GPIO port used for chip select (CS).                          |
+| `CS_PinNumber`  | `uint16_t`           | **Required**. Chip select pin number.                                       |
+| `MCP_Mode`      | `uint8_t`            | **Required**. MCP operating mode.                                           |
 
-#### GPIO Pin Data Read
+#### Start Communication
 
 ```c
-uint8_t RB_GPIO_ReadInputPin(GPIOx_t *pGPIOx, uint8_t PinNumber)
+void MCP3008_StartCommunication(MCP_Handler_t *Mcp_Handle)
 ```
 
-| Parameter            | Type             | Description                                         |
-| :------------------- | :--------------- | :-------------------------------------------------- |
-| `pGPIOx`             | `GPIOx_t*`       | **Required**. Pointer to the GPIO port (e.g., `GPIOA`). |
-| `PinNumber`          | `uint8_t`        | **Required**. GPIO pin number to read. |
+| Parameter       | Type             | Description                                                  |
+| :-------------- | :--------------- | :----------------------------------------------------------- |
+| `Mcp_Handle`    | `MCP_Handler_t*` | **Required**. Pointer to the MCP handler structure.           |
 
-#### GPIO Pin Data Write
+#### Stop Communication
 
 ```c
-void RB_GPIO_WriteOutputPin(GPIOx_t *pGPIOx, uint8_t PinNumber, uint8_t value)
+void MCP3008_StopCommunication(MCP_Handler_t *Mcp_Handle)
 ```
 
-| Parameter            | Type             | Description                                         |
-| :------------------- | :--------------- | :-------------------------------------------------- |
-| `pGPIOx`             | `GPIOx_t*`       | **Required**. Pointer to the GPIO port (e.g., `GPIOA`). |
-| `PinNumber`          | `uint8_t`        | **Required**. GPIO pin number to write to. |
-| `value`              | `uint8_t`        | **Required**. Value to write (either `GPIO_PIN_SET` or `GPIO_PIN_RESET`). |
+| Parameter       | Type             | Description                                                  |
+| :-------------- | :--------------- | :----------------------------------------------------------- |
+| `Mcp_Handle`    | `MCP_Handler_t*` | **Required**. Pointer to the MCP handler structure.           |
 
-#### GPIO Pin Toggle
+#### Reset Communication
 
 ```c
-void RB_GPIO_TogglePin(GPIOx_t *pGPIOx, uint8_t PinNumber)
+void MCP3008_ResetCommunication(MCP_Handler_t *Mcp_Handle)
 ```
 
-| Parameter            | Type             | Description                                         |
-| :------------------- | :--------------- | :-------------------------------------------------- |
-| `pGPIOx`             | `GPIOx_t*`       | **Required**. Pointer to the GPIO port (e.g., `GPIOA`). |
-| `PinNumber`          | `uint8_t`        | **Required**. GPIO pin number to toggle. |
+| Parameter       | Type             | Description                                                  |
+| :-------------- | :--------------- | :----------------------------------------------------------- |
+| `Mcp_Handle`    | `MCP_Handler_t*` | **Required**. Pointer to the MCP handler structure.           |
 
-#### GPIO Interrupt Configuration
+#### Read Channel
 
 ```c
-void RB_GPIO_IRQITConfig(uint8_t IRQNumber, uint8_t state)
+uint16_t MCP3008_ReadChannel(MCP_Handler_t *Mcp_Handle, uint8_t channel)
 ```
 
-| Parameter            | Type             | Description                                         |
-| :------------------- | :--------------- | :-------------------------------------------------- |
-| `IRQNumber`          | `uint8_t`        | **Required**. Interrupt request line (e.g., 6 for EXTI Line 0). |
-| `state`              | `uint8_t`        | **Required**. Enable (`ENABLE`) or Disable (`DISABLE`) the interrupt. |
-
-#### GPIO Interrupt Priority Configuration
-
-```c
-void RB_GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t Priority)
-```
-
-| Parameter            | Type             | Description                                         |
-| :------------------- | :--------------- | :-------------------------------------------------- |
-| `IRQNumber`          | `uint8_t`        | **Required**. Interrupt request line (e.g., 6 for EXTI Line 0). |
-| `Priority`           | `uint32_t`       | **Required**. Interrupt priority (value between 0 and 15). |
+| Parameter       | Type             | Description                                                  |
+| :-------------- | :--------------- | :----------------------------------------------------------- |
+| `Mcp_Handle`    | `MCP_Handler_t*` | **Required**. Pointer to the MCP handler structure.           |
+| `channel`       | `uint8_t`        | **Required**. Channel number to read from the MCP3008.        |
 
 ---
 
 ## Usage Example
 
-### GPIO Initialization Example
+### MCP3008 Initialization Example
 
 ```c
-#include "stm32f401xx.h"
+#include "mcp3008.h"
 
 int main() {
-    GPIOx_Handler_t gpioHandler;
-    gpioHandler.pGPIOx = GPIOA;  // Select GPIOA port
-    gpioHandler.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_5;  // Pin number 5
-    gpioHandler.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_OUTPUT;  // Output mode
-    gpioHandler.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;  // Speed: Fast
-    gpioHandler.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PUPD_NO_PULL;  // No pull-up or pull-down
+    MCP_Handler_t mcpHandler;
+    SPI_HandleTypeDef hspi1;
 
-    RB_GPIO_Init(&gpioHandler);  // Initialize the GPIO pin
-    
+    MCP3008_Init(&mcpHandler, &hspi1, GPIOA, GPIO_PIN_4, MCP_SINGLE_ENDED);
+
     while(1) {
-        RB_GPIO_WriteOutputPin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);  // Set the pin to high
-        delay();  // Simple delay
-        RB_GPIO_WriteOutputPin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);  // Set the pin to low
-        delay();  // Simple delay
+        uint16_t adcValue = MCP3008_ReadChannel(&mcpHandler, 0); // Read from channel 0
     }
 }
 ```
 
-### Interrupt Example
+### MCP3008 Communication Example
 
 ```c
-#include "stm32f401xx.h"
-
-void EXTI0_IRQHandler(void) {
-    // Interrupt handling code
-    RB_GPIO_TogglePin(GPIOA, GPIO_PIN_0);  // Toggle the state of pin 0
-}
+#include "mcp3008.h"
 
 int main() {
-    GPIOx_Handler_t gpioHandler;
-    gpioHandler.pGPIOx = GPIOA;
-    gpioHandler.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_0;
-    gpioHandler.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_IT_FT;  // Falling edge interrupt
+    MCP_Handler_t mcpHandler;
+    SPI_HandleTypeDef hspi1;
 
-    RB_GPIO_Init(&gpioHandler);
-    RB_GPIO_IRQITConfig(6, ENABLE);  // Enable IRQ for EXTI Line 0
+    MCP3008_Init(&mcpHandler, &hspi1, GPIOA, GPIO_PIN_4, MCP_SINGLE_ENDED);
+
+    MCP3008_StartCommunication(&mcpHandler);
+    uint16_t value = MCP3008_ReadChannel(&mcpHandler, 1);
+    MCP3008_StopCommunication(&mcpHandler);
 
     while(1) {
         // Main loop
@@ -151,3 +113,5 @@ Contributions are welcome! If you'd like to report bugs, suggest features, or su
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+                   
